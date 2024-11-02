@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { IoClose } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
 
 const RegisterPage = () => {
@@ -13,7 +14,7 @@ const RegisterPage = () => {
     password: '',
     profile_pic: '',
   });
-  const [uploadPhoto, setUploadPhoto] = useState<File | string>('');
+  const [uploadPhoto, setUploadPhoto] = useState<File | string | null>('');
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -28,20 +29,35 @@ const RegisterPage = () => {
     const file = e.target.files?.[0];
 
     if (file) {
-      setUploadPhoto(file);
+      if (file.type.startsWith('image/')) {
+        setUploadPhoto(file);
+      } else {
+        console.log('Please upload a valid image file.');
+      }
     } else {
-      return console.log('No file selected');
+      console.log('No file selected');
     }
   };
 
   console.log('fileeee', uploadPhoto);
+
+  const handleClearUploadPhoto = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setUploadPhoto(null);
+  };
+
+  const handleSubmit = (e: React.ChangeEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
 
   return (
     <div className="mt-5">
       <div className="bg-white w-full max-w-md  rounded overflow-hidden p-4 mx-auto">
         <h3>Welcome to Chat app!</h3>
 
-        <form className="grid gap-4 mt-5">
+        <form onSubmit={handleSubmit} className="grid gap-4 mt-5">
           <div className="flex flex-col gap-1">
             <label htmlFor="name">Name :</label>
             <input
@@ -88,19 +104,21 @@ const RegisterPage = () => {
             <label htmlFor="profile_pic">
               Photo :
               <div className="h-14 bg-slate-200 flex justify-center items-center border rounded hover:border-primary cursor-pointer">
-                {/* <p className="text-sm max-w-[300px] text-ellipsis line-clamp-1">
-                  {uploadPhoto?.name
-                    ? uploadPhoto?.name
+                <p className="text-sm max-w-[300px] text-ellipsis line-clamp-1">
+                  {(uploadPhoto as File)?.name
+                    ? (uploadPhoto as File)?.name
                     : 'Upload profile photo'}
                 </p>
-                {uploadPhoto?.name && (
+                {(uploadPhoto as File)?.name && (
                   <button
+                    type="button"
+                    title="Clear"
                     className="text-lg ml-2 hover:text-red-600"
                     onClick={handleClearUploadPhoto}
                   >
                     <IoClose />
                   </button>
-                )} */}
+                )}
               </div>
             </label>
 
@@ -108,6 +126,7 @@ const RegisterPage = () => {
               type="file"
               id="profile_pic"
               name="profile_pic"
+              accept="image/*" // Only allows image file types
               className="bg-slate-100 px-2 py-1 focus:outline-primary hidden"
               onChange={handleUploadPhoto}
             />
