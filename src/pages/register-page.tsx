@@ -13,14 +13,28 @@ const RegisterPage = () => {
     password: '',
     profile_pic: '',
   });
+  const [uploadPhoto, setUploadPhoto] = useState<File | string>('');
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+
     setData({
       ...data,
       [name]: value,
     });
   };
+
+  const handleUploadPhoto = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+
+    if (file) {
+      setUploadPhoto(file);
+    } else {
+      return console.log('No file selected');
+    }
+  };
+
+  console.log('fileeee', uploadPhoto);
 
   return (
     <div className="mt-5">
@@ -95,6 +109,7 @@ const RegisterPage = () => {
               id="profile_pic"
               name="profile_pic"
               className="bg-slate-100 px-2 py-1 focus:outline-primary hidden"
+              onChange={handleUploadPhoto}
             />
           </div>
 
