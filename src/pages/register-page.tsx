@@ -50,6 +50,7 @@ const RegisterPage = () => {
   const handleSubmit = (e: React.ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
     e.stopPropagation();
+    console.log('data', data);
   };
 
   return (
