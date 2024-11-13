@@ -14,6 +14,7 @@ const RegisterPage = () => {
     password: '',
     profile_pic: '',
   });
+  
   const [uploadPhoto, setUploadPhoto] = useState<File | string | null>('');
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
