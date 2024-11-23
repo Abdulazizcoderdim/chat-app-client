@@ -1,6 +1,8 @@
+import axios from 'axios';
 import React, { useState } from 'react';
 import { IoClose } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
+import { uploadFile } from '../helpers/upload-file';
 
 const RegisterPage = () => {
   const [data, setData] = useState<{
@@ -14,7 +16,7 @@ const RegisterPage = () => {
     password: '',
     profile_pic: '',
   });
-  
+
   const [uploadPhoto, setUploadPhoto] = useState<File | string | null>('');
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,21 +28,24 @@ const RegisterPage = () => {
     });
   };
 
-  const handleUploadPhoto = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleUploadPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
 
-    if (file) {
-      if (file.type.startsWith('image/')) {
-        setUploadPhoto(file);
-      } else {
-        console.log('Please upload a valid image file.');
-      }
-    } else {
-      console.log('No file selected');
-    }
-  };
+    const uploadPhoto = await uploadFile(file as File);
 
-  console.log('fileeee', uploadPhoto);
+    if (file?.type.startsWith('image/')) {
+      setUploadPhoto(file);
+    } else {
+      console.log('Please upload a valid image file.');
+    }
+
+    setData(prev => {
+      return {
+        ...prev,
+        profile_pic: uploadPhoto?.url,
+      };
+    });
+  };
 
   const handleClearUploadPhoto = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -48,9 +53,19 @@ const RegisterPage = () => {
     setUploadPhoto(null);
   };
 
-  const handleSubmit = (e: React.ChangeEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
     e.stopPropagation();
+
+    const URL = `${import.meta.env.VITE_PUBLIC_BACKEND_API}/api/register`;
+
+    try {
+      const res = await axios.post(URL, data);
+      console.log('res', res.data);
+    } catch (error) {
+      console.log('error regsiter', error);
+    }
+
     console.log('data', data);
   };
 
