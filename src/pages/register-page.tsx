@@ -1,7 +1,8 @@
 import axios from 'axios';
 import React, { useState } from 'react';
+import toast from 'react-hot-toast';
 import { IoClose } from 'react-icons/io5';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { uploadFile } from '../helpers/upload-file';
 
 const RegisterPage = () => {
@@ -16,7 +17,8 @@ const RegisterPage = () => {
     password: '',
     profile_pic: '',
   });
-
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
   const [uploadPhoto, setUploadPhoto] = useState<File | string | null>('');
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -30,7 +32,6 @@ const RegisterPage = () => {
 
   const handleUploadPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-
     const uploadPhoto = await uploadFile(file as File);
 
     if (file?.type.startsWith('image/')) {
@@ -60,13 +61,27 @@ const RegisterPage = () => {
     const URL = `${import.meta.env.VITE_PUBLIC_BACKEND_API}/api/register`;
 
     try {
+      setLoading(true);
       const res = await axios.post(URL, data);
-      console.log('res', res.data);
-    } catch (error) {
-      console.log('error regsiter', error);
-    }
 
-    console.log('data', data);
+      toast.success(res?.data?.message);
+
+      if (res?.data?.success) {
+        setData({
+          name: '',
+          email: '',
+          password: '',
+          profile_pic: '',
+        });
+        navigate('/email');
+      }
+    } catch (error) {
+      // @ts-expect-error: error?.response.data.message may be null or undefined
+      toast.error(error?.response?.data?.message || 'Something went wrong');
+      console.log('error regsiter', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -106,6 +121,7 @@ const RegisterPage = () => {
           <div className="flex flex-col gap-1">
             <label htmlFor="password">Password :</label>
             <input
+              min={6}
               type="password"
               id="password"
               name="password"
@@ -149,8 +165,11 @@ const RegisterPage = () => {
             />
           </div>
 
-          <button className="bg-primary text-lg  px-4 py-1 hover:bg-secondary rounded mt-2 font-bold text-white leading-relaxed tracking-wide">
-            Register
+          <button
+            type="submit"
+            className="bg-primary text-lg  px-4 py-1 hover:bg-secondary rounded mt-2 font-bold text-white leading-relaxed tracking-wide"
+          >
+            {loading ? 'Loading...' : 'Register'}
           </button>
         </form>
 

@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "forceConsistentCasingInFileNames": true,
-    "strict": true
+    "strict": true,
+    "useUnknownInCatchVariables": false,
     // ... other options ...
   },
   "files": [],
