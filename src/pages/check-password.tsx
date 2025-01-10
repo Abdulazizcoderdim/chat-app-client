@@ -24,6 +24,7 @@ const CheckPasswordPage = () => {
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
+    
     setData(preve => {
       return {
         ...preve,
